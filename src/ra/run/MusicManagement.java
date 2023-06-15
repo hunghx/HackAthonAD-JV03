@@ -1,16 +1,31 @@
 package ra.run;
 
+import ra.config.Config;
 import ra.config.InputMethods;
+import ra.controller.SearchController;
 import ra.controller.SingerController;
 import ra.controller.SongController;
 import ra.model.Singer;
 import ra.model.Song;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+
 public class MusicManagement {
     private final static SingerController singerController = new SingerController();
     private final static SongController songController = new SongController();
 
+    private final static SearchController searchController = new SearchController();
+
     public static void main(String[] args) {
+        singerController.save(new Singer(1,"phạm tấn Bình", 20, "viet nam", false, "nhạc đỏ"));
+        singerController.save(new Singer(2,"Hùng",19,"VN",true,"Nhạc vàng"));
+
+        songController.save(new Song("S001","Đi học","code",singerController.findById(1),"HH",new Date(),true));
+        songController.save(new Song("S002","Đi chơi","hết tiền",singerController.findById(2),"HH",new Date(),true));
+        songController.save(new Song("S003","Đi nhậu","say", singerController.findById(2),"HH",new Date(),true));
 //        Config.scanner().nextInt()
 //        Singer[] sings = {new Singer(1,"Hùng",19,"VN",true,"Nhạc vàng"),
 //                new Singer(2,"Nam",19,"VN",true,"Nhạc Xanh")};
@@ -263,8 +278,81 @@ public class MusicManagement {
         songController.deleteSong(idDel);
     }
 
-    public static void menuSearchManager() {
+   static private String getKeyword(){
+        System.out.println("nhập keyword:");
+        return InputMethods.getString();
+    }
 
+    public static void menuSearchManager() {
+        int choice;
+        while (true){
+            System.out.println("1.Tìm kiếm bài hát theo tên ca sĩ hoặc thể loại . [5 điểm]\n" +
+                    "2.Tìm kiếm ca sĩ theo tên hoặc thể loại [5 điểm]\n" +
+                    "3.Hiển thị danh sách bài hát theo thứ tự tên tăng dần [5 điểm]\n" +
+                    "4.Hiển thị 10 bài hát được đăng mới nhất [10 điểm]\n" +
+                    "5.Thoát");
+            choice = InputMethods.getInteger();
+            switch (choice){
+                case 1:
+                    searchSongBySingerNameOrGenre();
+                    break;
+                case 2:
+                    getSingerByNameOrGenre();
+                    break;
+                case 3:
+                    sortSongByName();
+                    break;
+                case 4: sortSongByDate();
+                    break;
+                case 5:
+                   return;
+            }
+        }
+    }
+
+    private static void sortSongByName(){
+        Song[] song = songController.getAll(); // lấy danh sách tất cả bài hát
+        Song[] newSong = searchController.sortSongByName(song);
+        /** hiển thị */
+        for (Song s: newSong) {
+            if (song != null){
+                s.displayData();
+            }
+        }
+    }
+
+    public static void sortSongByDate(){
+        Song[] song = songController.getAll(); // lấy danh sách tất cả bài hát
+
+        Song[] newSong = searchController.sortSongByDate(song);
+        for (Song s: newSong
+             ) {
+            s.displayData();
+        }
+    }
+
+
+        private static void getSingerByNameOrGenre() {
+        String keyword = getKeyword();
+        Singer[] singers = singerController.getAll();
+        Singer[] result = searchController.findSingerByNameOrGenre(keyword, singers);
+        for (Singer s: result) {
+            if (s != null){
+                s.displayData();
+            }
+        }
+    }
+
+    private static void searchSongBySingerNameOrGenre() {
+        Song[] songs = songController.getAll();
+        String keyword = getKeyword();
+        Song[] result = searchController.searchBySingerGenre(keyword, songs);
+        System.out.println("kết quả tìm kiếm: ");
+        for (Song song: result) {
+            if (song != null){
+                song.displayData();
+            }
+        }
     }
 
 }

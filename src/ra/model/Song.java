@@ -4,7 +4,7 @@ import ra.config.InputMethods;
 
 import java.util.Date;
 
-public class Song {
+public class Song implements Comparable<Song> {
     private String songId;
     private  String songName;
     private  String descriptions;
@@ -177,4 +177,19 @@ public class Song {
         System.out.println("SongWriter "+ songWriter + " | Status : "+(songStatus?"Hoạt động":"Không họat động"));
         System.out.println("CreatedDate : " + createdDate);
     }
+
+
+    @Override
+    public int compareTo(Song other) {
+        if (this.songName == null && other.songName == null) {
+            return 0;
+        } else if (this.songName == null) {
+            return -1;
+        } else if (other == null || other.songName == null) {
+            return 1;
+        } else {
+            return this.songName.compareTo(other.songName);
+        }
+    }
+
 }
